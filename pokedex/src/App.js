@@ -15,7 +15,7 @@ import Pokemon from "./components/pokemonComponents/Pokemon";
 class App extends Component {
   render() {
     return (
-      <Router>
+      <Router basename="/">
         <div className="App" style={{ background: `url(${backgroundImage})` }}>
           <NavBar />
           <div className="container">
