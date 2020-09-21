@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 
 import PokemonCard from "./PokemonCard";
-// import Loading from "../layout/Loading";
 import axios from "axios";
 
 export default class PokemonList extends Component {
@@ -11,7 +10,9 @@ export default class PokemonList extends Component {
   };
 
   async componentDidMount() {
+    //Pull the data from this states url. As set above.
     const res = await axios.get(this.state.url);
+    //returns the object with the data, and in this case sets it to the "results" column of the API which is the array of pokemon. path is res.data.results in this case
     this.setState({ pokemon: res.data["results"] });
     console.log(res);
   }
@@ -19,9 +20,11 @@ export default class PokemonList extends Component {
   render() {
     return (
       <React.Fragment>
+        {/* If pokemon exists create a card with their unique property values. If not display not loaded yet on the page. */}
         {this.state.pokemon ? (
           <div className="row">
             {this.state.pokemon.map((pokemon) => (
+              // Maps through each pokemon and assigns their values as fetched from res.data.results.
               <PokemonCard
                 key={pokemon.name}
                 name={pokemon.name}

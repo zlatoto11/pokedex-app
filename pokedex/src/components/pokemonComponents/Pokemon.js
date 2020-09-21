@@ -52,6 +52,7 @@ export default class Pokemon extends Component {
   };
 
   async componentDidMount() {
+    //gets pokemon index from props.
     const { pokemonIndex } = this.props.match.params;
 
     // Urls for pokemon information
@@ -61,11 +62,14 @@ export default class Pokemon extends Component {
     // Get Pokemon Information
     const pokemonRes = await Axios.get(pokemonUrl);
 
+    //gets the data from the individual pokemon url.
     const name = pokemonRes.data.name;
     const imageUrl = pokemonRes.data.sprites.front_default;
 
+    //sets these strings to empty initially.
     let { hp, attack, defense, speed, specialAttack, specialDefense } = "";
 
+    //goes through each piece of data in the stat array and maps it to the created stats.
     pokemonRes.data.stats.map((stat) => {
       switch (stat.stat.name) {
         case "hp":
@@ -91,17 +95,19 @@ export default class Pokemon extends Component {
       }
     });
 
+    // Convertions from pokemon to real life.
     // Convert Decimeters to Feet... The + 0.0001 * 100 ) / 100 is for rounding to two decimal places :)
     const height =
       Math.round((pokemonRes.data.height * 0.328084 + 0.00001) * 100) / 100;
 
     const weight =
       Math.round((pokemonRes.data.weight * 0.220462 + 0.00001) * 100) / 100;
-
+    //Types is an array as a pokemon could have multiple. We go through and get all the types from the array.
     const types = pokemonRes.data.types.map((type) => type.type.name);
 
     const themeColor = `${TYPE_COLORS[types[types.length - 1]]}`;
 
+    //Get the abillity and same as before separate and only capitalize the first letter.
     const abilities = pokemonRes.data.abilities
       .map((ability) => {
         return ability.ability.name
@@ -111,7 +117,7 @@ export default class Pokemon extends Component {
           .join(" ");
       })
       .join(", ");
-
+    //Filter will only pass back the ones that we declare. if effort is greater than 0 give us the stat otherwise not.
     const evs = pokemonRes.data.stats
       .filter((stat) => {
         if (stat.effort > 0) {
@@ -128,21 +134,25 @@ export default class Pokemon extends Component {
       })
       .join(", ");
 
-    // Get Pokemon Description .... Is from a different end point uggh
+    // Get Pokemon Description, Catch Rate, EggGroups, Gender ratio, Hatch Steps from a different end point.
     await Axios.get(pokemonSpeciesUrl).then((res) => {
       let description = "";
+      //go through them but only return the flavour which returns with language name "en". aka only return english info.
       res.data.flavor_text_entries.some((flavor) => {
         if (flavor.language.name === "en") {
           description = flavor.flavor_text;
           return;
         }
       });
+
+      //calculating the gender ratio.
       const femaleRate = res.data["gender_rate"];
       const genderRatioFemale = 12.5 * femaleRate;
       const genderRatioMale = 12.5 * (8 - femaleRate);
 
       const catchRate = Math.round((100 / 255) * res.data["capture_rate"]);
 
+      //grab the data from "egg_groups" and do the same capitalize trick from earlier.
       const eggGroups = res.data["egg_groups"]
         .map((group) => {
           return group.name
@@ -153,8 +163,10 @@ export default class Pokemon extends Component {
         })
         .join(", ");
 
+      // doing exact math as pokeapi tells us to do (to hatch a pokemone it must be hatchcounter + 1 steps)
       const hatchSteps = 255 * (res.data["hatch_counter"] + 1);
 
+      //updating the stats.
       this.setState({
         description,
         genderRatioFemale,
@@ -164,7 +176,7 @@ export default class Pokemon extends Component {
         hatchSteps,
       });
     });
-
+    //updating the stats
     this.setState({
       imageUrl,
       pokemonIndex,

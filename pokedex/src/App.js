@@ -21,6 +21,7 @@ class App extends Component {
           <div className="container">
             <Switch>
               <Route exact path="/" component={Dashboard} />
+              {/* Dynamic URL routing for react router. using the : operator */}
               <Route
                 exact
                 path="/pokemonComponents/:pokemonIndex"
